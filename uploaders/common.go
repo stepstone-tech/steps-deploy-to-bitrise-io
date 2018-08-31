@@ -134,6 +134,8 @@ func uploadArtifact(uploadURL, artifactPth, contentType string) error {
 		if err != nil {
 			return err
 		}
+
+		log.Warnf("cmd: " + cmd.PrintableCommandArgs())
 		cmd.SetStdout(os.Stdout).SetStderr(os.Stderr)
 		return cmd.Run()
 	})
