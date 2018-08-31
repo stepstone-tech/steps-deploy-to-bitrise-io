@@ -1,7 +1,7 @@
 package uploaders
 
 import (
-	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -135,9 +135,9 @@ func uploadArtifact(uploadURL, artifactPth, contentType string) error {
 		if err != nil {
 			return fmt.Errorf("failed to open artifact (%s), error: %s", artifactPth, err)
 		}
-		r := bufio.NewReader(f)
 
-		response, err := http.Post(uploadURL, contentType, r)
+		content, err := ioutil.ReadAll(f)
+		response, err := http.Post(uploadURL, contentType, bytes.NewReader(content))
 		if err != nil {
 			return fmt.Errorf("failed to perform finish artifact request, error: %s", err)
 		}
