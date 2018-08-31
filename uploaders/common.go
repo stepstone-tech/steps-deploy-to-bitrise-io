@@ -1,6 +1,7 @@
 package uploaders
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/retry"
 	"github.com/bitrise-io/go-utils/urlutil"
@@ -120,25 +120,70 @@ func uploadArtifact(uploadURL, artifactPth, contentType string) error {
 		}
 	}()
 
-	args := []string{"curl", "--fail", "--tlsv1", "--globoff"}
-	if contentType != "" {
-		args = append(args, "-H", fmt.Sprintf("Content-Type: %s", contentType))
-	}
-	args = append(args, "-T", artifactPth, "-X", "PUT", uploadURL)
+	// type finishArtifactResponse struct {
+	// 	PublicInstallPageURL string   `json:"public_install_page_url"`
+	// 	InvalidEmails        []string `json:"invalid_emails"`
+	// }
 
-	return retry.Times(3).Wait(5 * time.Second).Try(func(attempt uint) error {
+	var uploadArtifactResponse string
+	err = retry.Times(3).Wait(5 * time.Second).Try(func(attempt uint) error {
 		if attempt > 0 {
 			log.Warnf("%d attempt failed", attempt)
 		}
-		cmd, err := command.NewFromSlice(args)
+
+		f, err := os.Open(artifactPth)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open artifact (%s), error: %s", artifactPth, err)
+		}
+		r := bufio.NewReader(f)
+
+		response, err := http.Post(uploadURL, contentType, r)
+		if err != nil {
+			return fmt.Errorf("failed to perform finish artifact request, error: %s", err)
+		}
+		defer func() {
+			if err := response.Body.Close(); err != nil {
+				log.Errorf("Failed to close reponse body, error: %s", err)
+			}
+		}()
+
+		// process response
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read finish artifact response, error: %s", err)
+		}
+		if response.StatusCode != http.StatusOK {
+			return fmt.Errorf("failed to create artifact on bitrise, status code: %d, response: %s", response.StatusCode, string(body))
 		}
 
-		log.Warnf("cmd: " + cmd.PrintableCommandArgs())
-		cmd.SetStdout(os.Stdout).SetStderr(os.Stderr)
-		return cmd.Run()
+		if err := json.Unmarshal(body, &uploadArtifactResponse); err != nil {
+			return fmt.Errorf("failed to unmarshal response (%s), error: %s", string(body), err)
+		}
+
+		return nil
 	})
+
+	return err
+
+	// args := []string{"curl", "--fail", "--tlsv1", "--globoff"}
+	// if contentType != "" {
+	// 	args = append(args, "-H", fmt.Sprintf("Content-Type: %s", contentType))
+	// }
+	// args = append(args, "-T", artifactPth, "-X", "PUT", uploadURL)
+
+	// return retry.Times(3).Wait(5 * time.Second).Try(func(attempt uint) error {
+	// 	if attempt > 0 {
+	// 		log.Warnf("%d attempt failed", attempt)
+	// 	}
+	// 	cmd, err := command.NewFromSlice(args)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	log.Warnf("cmd: " + cmd.PrintableCommandArgs())
+	// 	cmd.SetStdout(os.Stdout).SetStderr(os.Stderr)
+	// 	return cmd.Run()
+	// })
 }
 
 func finishArtifact(buildURL, token, artifactID, artifactInfo, notifyUserGroups, notifyEmails, isEnablePublicPage string) (string, error) {
