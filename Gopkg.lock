@@ -2,56 +2,118 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/bitrise-io/go-utils"
-  packages = ["colorstring","command","errorutil","fileutil","log","pathutil","pkcs12","pkcs12/internal/rc2","retry","urlutil","ziputil"]
-  revision = "961320f9011cedf55e1da0578949bf63450a96c0"
+  digest = "1:b5f28f7eda54d2695765c778c951a2ace52c06afb7da1f7e0c7485baa5b02100"
+  name = "github.com/beevik/etree"
+  packages = ["."]
+  pruneopts = ""
+  revision = "9d7e8feddccb4ed1b8afb54e368bd323d2ff652c"
+  version = "v1.0.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:5306f1051f67906b51a08c34bfb52fafd0f0634b275dc5b92aa368a3aeb573a7"
+  name = "github.com/bitrise-io/go-utils"
+  packages = [
+    "colorstring",
+    "command",
+    "errorutil",
+    "fileutil",
+    "log",
+    "pathutil",
+    "pkcs12",
+    "pkcs12/internal/rc2",
+    "retry",
+    "urlutil",
+    "ziputil",
+  ]
+  pruneopts = ""
+  revision = "d1de0dbcb811588e61362aff67bb700b93c13c17"
+
+[[projects]]
+  branch = "master"
+  digest = "1:dba3a87193bcb322fa9ad2dd2b5cf9a4d1066b99eddc443f980f91e4793b6c8e"
   name = "github.com/bitrise-tools/go-android"
   packages = ["sdk"]
+  pruneopts = ""
   revision = "00b72392d46cd594ca6a1c240ec9d8936127f4a4"
 
 [[projects]]
   branch = "master"
+  digest = "1:72a8d801f07bd7a986bbe233f5e9b93e636e3728ed9712dfc0b6dc56820f5fe1"
   name = "github.com/bitrise-tools/go-steputils"
-  packages = ["input","tools"]
+  packages = [
+    "input",
+    "tools",
+  ]
+  pruneopts = ""
   revision = "a848c9870ff7d745a8fb2a951e1c81fcb147b4ec"
 
 [[projects]]
   branch = "master"
+  digest = "1:22081e594df61abe4448e736748d52c3bc33b32ea6055fab25f92960af03f431"
   name = "github.com/bitrise-tools/go-xcode"
-  packages = ["certificateutil","exportoptions","ipa","models","plistutil","profileutil","utility"]
+  packages = [
+    "certificateutil",
+    "exportoptions",
+    "ipa",
+    "models",
+    "plistutil",
+    "profileutil",
+    "utility",
+  ]
+  pruneopts = ""
   revision = "6ef1fa022c0b47d73da0028f52b4be86bc6248a0"
 
 [[projects]]
   branch = "master"
+  digest = "1:79f0eecec67bc768713829e38fb5b7a198d7fee2ad1019d2d7adf0b3de8520ac"
   name = "github.com/fullsailor/pkcs7"
   packages = ["."]
+  pruneopts = ""
   revision = "a009d8d7de53d9503c797cb8ec66fa3b21eed209"
 
 [[projects]]
   branch = "master"
+  digest = "1:2aa07a6931b73e70f07a5bd30ef30a73cd103aa06291213c4e46e3fe52822dea"
   name = "github.com/hashicorp/go-version"
   packages = ["."]
+  pruneopts = ""
   revision = "fc61389e27c71d120f87031ca8c88a3428f372dd"
 
 [[projects]]
+  digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = ""
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:ac8b19a1e2c4c474da6dfbc28db0d8d17ee1e944fe8167db7208b6caccfbfc24"
   name = "howett.net/plist"
   packages = ["."]
+  pruneopts = ""
   revision = "233df3c4f07b0c562da0e8a6fb850681ac49bb90"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "11a91fd6c3234bea574b52e6e71f55047f3899549ff2667886c4b444e9ed2e4b"
+  input-imports = [
+    "github.com/beevik/etree",
+    "github.com/bitrise-io/go-utils/command",
+    "github.com/bitrise-io/go-utils/log",
+    "github.com/bitrise-io/go-utils/pathutil",
+    "github.com/bitrise-io/go-utils/retry",
+    "github.com/bitrise-io/go-utils/urlutil",
+    "github.com/bitrise-io/go-utils/ziputil",
+    "github.com/bitrise-tools/go-android/sdk",
+    "github.com/bitrise-tools/go-steputils/input",
+    "github.com/bitrise-tools/go-steputils/tools",
+    "github.com/bitrise-tools/go-xcode/exportoptions",
+    "github.com/bitrise-tools/go-xcode/ipa",
+    "github.com/bitrise-tools/go-xcode/plistutil",
+    "github.com/bitrise-tools/go-xcode/profileutil",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
