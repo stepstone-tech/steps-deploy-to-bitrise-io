@@ -2,6 +2,7 @@ package android
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/beevik/etree"
 	"github.com/bitrise-io/go-utils/command"
-	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 )
 
@@ -64,7 +64,6 @@ func findIcon(manifestPth, resPth string) (string, error) {
 		app := man.SelectElement("application")
 		ic := app.SelectAttr("android:icon")
 		iconName = strings.TrimPrefix(ic.Value, `@mipmap/`)
-		log.Warnf(ic.Value)
 	}
 
 	//
@@ -122,6 +121,5 @@ func FetchIcon(apkPth string) (string, error) {
 	apkName := strings.TrimRight(path.Base(apkPth), path.Ext(apkPth))
 	xmlPth := path.Join(tempDir, apkName, "AndroidManifest.xml")
 	resPth := path.Join(tempDir, apkName, "res")
-	log.Debugf("Decompiled .xml path: %s", xmlPth)
 	return findIcon(xmlPth, resPth)
 }

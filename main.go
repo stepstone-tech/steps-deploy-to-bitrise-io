@@ -11,7 +11,8 @@ import (
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/ziputil"
-	"github.com/bitrise-io/steps-deploy-to-bitrise-io/uploaders"
+	"github.com/bitrise-io/steps-deploy-to-bitrise-io/icon/android"
+	"github.com/bitrise-io/steps-deploy-to-bitrise-io/icon/ios"
 	"github.com/bitrise-tools/go-steputils/input"
 	"github.com/bitrise-tools/go-steputils/tools"
 )
@@ -96,6 +97,8 @@ func fail(format string, v ...interface{}) {
 func main() {
 	configs := createConfigsModelFromEnvs()
 	configs.DeployPath = strings.TrimSpace(configs.DeployPath)
+
+	log.SetEnableDebugLog(true)
 
 	fmt.Println()
 	configs.print()
@@ -195,38 +198,60 @@ func main() {
 		case ".ipa":
 			log.Donef("Uploading ipa file: %s", pth)
 
-			installPage, err := uploaders.DeployIPA(pth, configs.BuildURL, configs.APIToken, configs.NotifyUserGroups, configs.NotifyEmailList, configs.IsPublicPageEnabled)
+			fmt.Println()
+			log.Infof("Searching for the icon in the artifact")
+			icon, err := ios.FetchIcon(pth)
 			if err != nil {
-				fail("Deploy failed, error: %s", err)
+				log.Warnf("Failed to find icon for the IPA, error: %s", err)
+			} else if icon == "" {
+				log.Warnf("Didn't find icon for the IPA")
+			} else {
+				log.Debugf("Icon for the ipa: %s", icon)
 			}
 
-			if installPage != "" {
-				publicInstallPages[filepath.Base(pth)] = installPage
-			}
+			// installPage, err := uploaders.DeployIPA(pth, configs.BuildURL, configs.APIToken, configs.NotifyUserGroups, configs.NotifyEmailList, configs.IsPublicPageEnabled)
+			// if err != nil {
+			// 	fail("Deploy failed, error: %s", err)
+			// }
+
+			// if installPage != "" {
+			// 	publicInstallPages[filepath.Base(pth)] = installPage
+			// }
 		case ".apk":
 			log.Donef("Uploading apk file: %s", pth)
 
-			installPage, err := uploaders.DeployAPK(pth, configs.BuildURL, configs.APIToken, configs.NotifyUserGroups, configs.NotifyEmailList, configs.IsPublicPageEnabled)
+			fmt.Println()
+			log.Infof("Searching for the icon in the artifacts")
+			icon, err := android.FetchIcon(pth)
 			if err != nil {
-				fail("Deploy failed, error: %s", err)
+				log.Warnf("Failed to find icon for the APK, error: %s", err)
+			} else if icon == "" {
+				log.Warnf("Didn't find .png for the APK")
+			} else {
+				log.Debugf("Icon for the apk: %s", icon)
 			}
 
-			if installPage != "" {
-				publicInstallPages[filepath.Base(pth)] = installPage
-			}
+			// installPage, err := uploaders.DeployAPK(pth, configs.BuildURL, configs.APIToken, configs.NotifyUserGroups, configs.NotifyEmailList, configs.IsPublicPageEnabled)
+			// if err != nil {
+			// 	fail("Deploy failed, error: %s", err)
+			// }
+
+			// if installPage != "" {
+			// 	publicInstallPages[filepath.Base(pth)] = installPage
+			// }
 		default:
 			log.Donef("Uploading file: %s", pth)
 
-			installPage, err := uploaders.DeployFile(pth, configs.BuildURL, configs.APIToken, configs.NotifyUserGroups, configs.NotifyEmailList, configs.IsPublicPageEnabled)
-			if err != nil {
-				fail("Deploy failed, error: %s", err)
-			}
+			// installPage, err := uploaders.DeployFile(pth, configs.BuildURL, configs.APIToken, configs.NotifyUserGroups, configs.NotifyEmailList, configs.IsPublicPageEnabled)
+			// if err != nil {
+			// 	fail("Deploy failed, error: %s", err)
+			// }
 
-			if installPage != "" {
-				publicInstallPages[filepath.Base(pth)] = installPage
-			} else if configs.IsPublicPageEnabled == "true" {
-				log.Warnf("is_enable_public_page is set, but public download isn't allowed for this type of file")
-			}
+			// if installPage != "" {
+			// 	publicInstallPages[filepath.Base(pth)] = installPage
+			// } else if configs.IsPublicPageEnabled == "true" {
+			// 	log.Warnf("is_enable_public_page is set, but public download isn't allowed for this type of file")
+			// }
 		}
 	}
 

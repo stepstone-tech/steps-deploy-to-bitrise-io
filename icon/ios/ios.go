@@ -3,6 +3,7 @@ package ios
 import (
 	"fmt"
 	"path"
+	"path/filepath"
 
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/ziputil"
@@ -38,21 +39,26 @@ func findIcons(plistData plistutil.PlistData) ([]string, error) {
 	return iconNames, nil
 }
 
+func pathsByPattern(paths ...string) ([]string, error) {
+	pattern := filepath.Join(paths...)
+	return filepath.Glob(pattern)
+}
+
 // FetchIcon ...
-func FetchIcon(ipaPth, projectName string) (string, error) {
+func FetchIcon(ipaPth string) (string, error) {
 	plistPth, err := ipa.UnwrapEmbeddedInfoPlist(ipaPth)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	infoPlistData, err := plistutil.NewPlistDataFromFile(plistPth)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	iconNames, err := findIcons(infoPlistData)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	if len(iconNames) == 0 {
@@ -64,9 +70,18 @@ func FetchIcon(ipaPth, projectName string) (string, error) {
 		return "", err
 	}
 
+	pths, err := pathsByPattern(dest, "Payload", "*.app")
+	if err != nil {
+		return "", err
+	}
+
+	if len(pths) == 0 {
+		return "", fmt.Errorf("couldn't find any *.app in the %s", path.Join(dest, "Payload"))
+	}
+
 	//
 	// @2x
-	iconPth := path.Join(dest, "Payload", projectName+".app", iconNames[0]+"@2x.png")
+	iconPth := path.Join(pths[0], iconNames[0]+"@2x.png")
 	exists, err := pathutil.IsPathExists(iconPth)
 	if err != nil {
 		return "", err
@@ -75,7 +90,7 @@ func FetchIcon(ipaPth, projectName string) (string, error) {
 	//
 	// if the @2x is not exists try the original one
 	if !exists {
-		iconPth = path.Join(dest, "Payload", projectName+".app", iconNames[0]+".png")
+		iconPth = path.Join(pths[0], iconNames[0]+".png")
 		exists, err = pathutil.IsPathExists(iconPth)
 		if err != nil {
 			return "", err
