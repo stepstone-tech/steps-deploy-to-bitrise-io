@@ -106,7 +106,7 @@ func httpCall(apiToken, method, url string, input io.Reader, output interface{})
 }
 
 func findImages(testDir string) (imageFilePaths []string) {
-	for _, ext := range []string{".jpg", ".jpeg", ".png"} {
+	for _, ext := range []string{".jpg", ".jpeg", ".png", ".log", ".zip"} {
 		if paths, err := filepath.Glob(filepath.Join(testDir, "*"+ext)); err == nil {
 			imageFilePaths = append(imageFilePaths, paths...)
 		}
